@@ -12,3 +12,63 @@ Solution: You have to collect all the rotten oranges and it will rot the adjacen
 and number of fresh oranges. Do the BFS, take each rotten orages and check all the four directions, if it is fresh orange, make it rottnen and add the index in the queue for 
 next iteration.
 
+class Solution {
+   
+public:
+    int orangesRotting(vector<vector<int>>& grid) {
+       
+        queue<pair<int,int>> rotten;
+        int freshOrg =0;
+        //collect all the rotten oranges
+        for(int i=0; i<grid.size(); ++i)
+        {
+            for(int j=0; j<grid[i].size(); ++j)
+            {
+                if(grid[i][j] == 2)
+                    rotten.push({i,j});
+                if(grid[i][j]==1)
+                    freshOrg++;
+            }
+        }
+        if(rotten.size()==0 && freshOrg >0) //if no rotten then not possible return -1;
+            return -1;
+        
+        vector<pair<int,int>> directions ={{0,1},{1,0},{0,-1},{-1,0}};
+        if(freshOrg==0)//if no fresh then 
+            return 0;
+        
+        int noOfDays=0;
+        while(freshOrg>0 && rotten.size()>0)
+        {
+            noOfDays++;
+            int oldFresh = freshOrg;
+            int size = rotten.size();
+            for(int i=0; i<size; ++i)
+            {
+                pair<int,int> current = rotten.front(); rotten.pop();
+                //Update in all the four directions.
+                for(int j=0; j<4; ++j)
+                {
+                    int xdir = directions[j].first;
+                    int ydir = directions[j].second;
+                    
+                    int xNext = current.first+xdir;
+                    int yNext = current.second+ydir;
+                    if(xNext<0 || xNext>=grid.size() || yNext<0 || yNext>=grid[0].size())//outsize boundary.
+                        continue;
+                    
+                    if(grid[xNext][yNext]==1)//if it is fresh
+                    {
+                        grid[xNext][yNext] = 2; //mark it rotten
+                        rotten.push({xNext,yNext});//add new rotten co-ordinate to queue
+                        freshOrg--;
+                    }
+                }
+                
+            }
+            if(oldFresh == freshOrg)//No change in the count
+                return -1;
+        }
+        return noOfDays;
+    }
+};
